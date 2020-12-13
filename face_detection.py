@@ -6,6 +6,7 @@ from keras.models import load_model, model_from_json
 from keras.preprocessing import image as Image
 from PIL import Image as im 
 import cv2
+import os
 
 glass_cascade = cv2.CascadeClassifier("haarcascades/haarcascade_eye_tree_eyeglasses.xml")
 
@@ -178,19 +179,22 @@ def vidoCapture():
 
 # try:
 vidoCapture()
-image = cv2.imread("extracted.png")
-# ssd(image)
-original_height, original_width = image.shape[:2]
-image_resize = cv2.resize(image, (64, 64), interpolation=cv2.INTER_AREA)
-brightness_corrected = brightness_correction(image_resize)
-filtered_image = gamma_correction(brightness_corrected)
-filtered_image = cv2.cvtColor(filtered_image, cv2.COLOR_BGR2GRAY)
-normalized_image = normalize_image(filtered_image)
-normalized_image = cv2.cvtColor(normalized_image, cv2.COLOR_GRAY2RGB)
-print(detect_glass(image)["detection"])
-cv2.imwrite("filtered" + '.png', normalized_image)
-image_resize = cv2.resize(normalized_image, (original_width, original_height), interpolation=cv2.INTER_LANCZOS4)
-# print(cnn_model(image)["message"])
-# print("Hello")
-# except:
-#     print("Fake Face")
+try:
+    image = cv2.imread("extracted.png")
+    # ssd(image)
+    original_height, original_width = image.shape[:2]
+    image_resize = cv2.resize(image, (64, 64), interpolation=cv2.INTER_AREA)
+    brightness_corrected = brightness_correction(image_resize)
+    filtered_image = gamma_correction(brightness_corrected)
+    filtered_image = cv2.cvtColor(filtered_image, cv2.COLOR_BGR2GRAY)
+    normalized_image = normalize_image(filtered_image)
+    normalized_image = cv2.cvtColor(normalized_image, cv2.COLOR_GRAY2RGB)
+    print(detect_glass(image)["detection"])
+    cv2.imwrite("filtered" + '.png', normalized_image)
+    image_resize = cv2.resize(normalized_image, (original_width, original_height), interpolation=cv2.INTER_LANCZOS4)
+    print(cnn_model(image)["message"])
+    # print("Hello")
+    # os.remove("extracted.png")
+    # os.remove("filtered.png")
+except:
+    print("Face Note Detected")
