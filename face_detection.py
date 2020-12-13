@@ -194,7 +194,7 @@ try:
     image_resize = cv2.resize(normalized_image, (original_width, original_height), interpolation=cv2.INTER_LANCZOS4)
     print(cnn_model(image)["message"])
     # print("Hello")
-    # os.remove("extracted.png")
-    # os.remove("filtered.png")
+    os.remove("extracted.png")
+    os.remove("filtered.png")
 except:
     print("Face Note Detected")
