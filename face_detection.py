@@ -177,31 +177,58 @@ def vidoCapture():
     cv2.destroyAllWindows()
 
 # try:
-vidoCapture()
-try:
-    image = cv2.imread("extracted.png")
-    original_height, original_width = image.shape[:2]
-    image_resize = cv2.resize(image, (64, 64), interpolation=cv2.INTER_AREA)
-    brightness_corrected = brightness_correction(image_resize)
-    filtered_image = gamma_correction(brightness_corrected)
-    glasses = detect_glass(brightness_corrected)["detection"]
-    eyes = detect_eyes(image)["detection"]
-    print("Glasses: " + str(glasses)) 
-    print("Eyes: "  + str(eyes))
-    if glasses < 3:
-        filtered_image = cv2.cvtColor(filtered_image, cv2.COLOR_BGR2GRAY)
-        normalized_image = normalize_image(filtered_image)
-        # normalized_image = cv2.cvtColor(normalized_image, cv2.COLOR_GRAY2RGB)
-        # image_resize = cv2.resize(brightness_corrected, (original_width, original_height), interpolation=cv2.INTER_LANCZOS4)
-        cv2.imwrite("filtered" + '.png', normalized_image)
-        print(cnn_model(image)["message"])
-        # print("Hello")
-        # os.remove("extracted.png")
-        # os.remove("filtered.png")
-    else:
-        print("Eyes not detected")
+# vidoCapture()
+# try:
+#     image = cv2.imread("extracted.png")
+#     original_height, original_width = image.shape[:2]
+#     image_resize = cv2.resize(image, (64, 64), interpolation=cv2.INTER_AREA)
+#     brightness_corrected = brightness_correction(image_resize)
+#     filtered_image = gamma_correction(brightness_corrected)
+#     glasses = detect_glass(brightness_corrected)["detection"]
+#     eyes = detect_eyes(image)["detection"]
+#     print("Glasses: " + str(glasses)) 
+#     print("Eyes: "  + str(eyes))
+#     if glasses < 3:
+#         filtered_image = cv2.cvtColor(filtered_image, cv2.COLOR_BGR2GRAY)
+#         normalized_image = normalize_image(filtered_image)
+#         # normalized_image = cv2.cvtColor(normalized_image, cv2.COLOR_GRAY2RGB)
+#         # image_resize = cv2.resize(brightness_corrected, (original_width, original_height), interpolation=cv2.INTER_LANCZOS4)
+#         cv2.imwrite("filtered" + '.png', normalized_image)
+#         print(cnn_model(image)["message"])
+#         # print("Hello")
+#         # os.remove("extracted.png")
+#         # os.remove("filtered.png")
+#     else:
+#         print("Eyes not detected")
+ 
+# create a new cam object
+cap = cv2.VideoCapture(0)
+# initialize the face recognizer (default face haar cascade)
+face_cascade = cv2.CascadeClassifier("haarcascades/haarcascade_frontalface_default.xml")
+while True:
+    # read the image from the cam
+    _, image = cap.read()
+    # converting to grayscale
+    # image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # detect all the faces in the image
+    faces = face_cascade.detectMultiScale(image, 1.3, 5)
+    # for every face, draw a blue rectangle
+    for x, y, width, height in faces:
+        print(x,y,width, height)
+        if (x > 250 and y > 175 and width > 180 and height > 180):
+            draw_border(image, (x, y), (x + width, y + height), (162, 255, 0), 2, 10, 10)
+            cv2.putText(image, "face", (width, y-4), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (192,168,0), 2, cv2.LINE_AA)
+            # cv2.rectangle(image, (x, y), (x + width, y + height), color=(255, 0, 0), thickness=2)
+            cv2.imwrite("extracted" + '.png', image)
+    cv2.imshow("image", image)
+    if cv2.waitKey(1) == ord("q"):
+        break
+cap.release()
+cv2.destroyAllWindows()
 
-except Exception as e:
-    print("Face Not Detected")
+# except Exception as e:
+#     print("Face Not Detected")
+    
 path = "./resources/anti_spoof_models"
 sp.test("extracted.png", path , 0)
+os.remove("extracted.png")

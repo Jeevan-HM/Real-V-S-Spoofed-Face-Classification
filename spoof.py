@@ -105,4 +105,3 @@ def path(image):
             help="image used to test")
         args = parser.parse_args()
         test(args.image_name, args.model_dir, args.device_id)
-path("beach.jpg")
