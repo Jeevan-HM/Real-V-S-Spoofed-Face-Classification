@@ -6,8 +6,10 @@ from keras.models import load_model, model_from_json
 from keras.preprocessing import image as Image
 from PIL import Image as im 
 import cv2
+import spoof as sp
 import os
 
+eye_cascade = cv2.CascadeClassifier("haarcascades/haarcascade_eye.xml")
 glass_cascade = cv2.CascadeClassifier("haarcascades/haarcascade_eye_tree_eyeglasses.xml")
 
 # Fancy box drawing function by Dan Masek
@@ -60,25 +62,6 @@ def gamma_correction(image):
             gamma_image[y][x] = linear_stretching(gamma_image[y][x], min_value, max_value)
     return gamma_image
 
-def ssd(image):
-    try:
-        id = 0
-        className = ["tv", "laptop", "cell phone", "book"]
-        classFile = "config/coco.names"
-        configPath = "config/ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt"
-        weightsPath = "config/frozen_inference_graph.pb"
-        net = cv2.dnn_DetectionModel(weightsPath, configPath)
-        net.setInputSize(200, 200)
-        net.setInputScale(1.0 / 127.5)
-        net.setInputMean((127.5, 127.5, 127.5))
-        net.setInputSwapRB(True)
-        classIDs = net.detect(image)
-        id = len(classIDs)
-        print(className[classIDs - 1])
-        return {"detection": id}
-    except Exception as e:
-        return {"detection": e}
-
 def normalize_image(image):
     image = image.copy()
     output = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX)
@@ -91,10 +74,26 @@ def detect_glass(image):
         glass_image = image.copy()
         glass_rect = glass_cascade.detectMultiScale(glass_image, scaleFactor=1.2)
         # print("Glass Detection = " + str(len(glass_rect)))
-        return {"image": glass_image, "detection": len(glass_rect)}
+        return {"detection": len(glass_rect)}
     except Exception as e:
-        return{"image": image, "detection": e}
+        return{"detection": e}
 
+def detect_eyes(image):
+    try:
+        eye_image = image.copy()
+        eye_rect = eye_cascade.detectMultiScale(eye_image, scaleFactor=1.2, minNeighbors=5)
+        eye_cords = []
+        eye_detection = 0
+        for (x, y, w, h) in eye_rect:
+            if len(eye_rect) == 2:
+                cv2.rectangle(eye_image, (x, y), (x + w, y + h), (255, 255, 255), 10)
+                eye_cords.append([x,y,w,h])
+        if len(eye_cords) >= 1:
+            eye_detection = len(eye_cords)
+        return {"detection": eye_detection}
+    except Exception as e:
+        return{"detection": e}
+    
 def cnn_model(image):
     try:
         img = im.fromarray(image) 
@@ -111,7 +110,7 @@ def cnn_model(image):
         test_image = np.expand_dims(test_image, axis=0)
         result = load_model.predict(test_image)
         # train.class_indices
-        print("Prediction = " + str(result[0]))
+        print("Prediction = " + str(result[0][0]))
         if result[0][0] > 0.05:
             return {"message": "Real Face"}
         else:
@@ -181,20 +180,28 @@ def vidoCapture():
 vidoCapture()
 try:
     image = cv2.imread("extracted.png")
-    # ssd(image)
     original_height, original_width = image.shape[:2]
     image_resize = cv2.resize(image, (64, 64), interpolation=cv2.INTER_AREA)
     brightness_corrected = brightness_correction(image_resize)
     filtered_image = gamma_correction(brightness_corrected)
-    filtered_image = cv2.cvtColor(filtered_image, cv2.COLOR_BGR2GRAY)
-    normalized_image = normalize_image(filtered_image)
-    normalized_image = cv2.cvtColor(normalized_image, cv2.COLOR_GRAY2RGB)
-    print(detect_glass(image)["detection"])
-    cv2.imwrite("filtered" + '.png', normalized_image)
-    image_resize = cv2.resize(normalized_image, (original_width, original_height), interpolation=cv2.INTER_LANCZOS4)
-    print(cnn_model(image)["message"])
-    # print("Hello")
-    os.remove("extracted.png")
-    os.remove("filtered.png")
-except:
-    print("Face Note Detected")
+    glasses = detect_glass(brightness_corrected)["detection"]
+    eyes = detect_eyes(image)["detection"]
+    print("Glasses: " + str(glasses)) 
+    print("Eyes: "  + str(eyes))
+    if glasses < 3:
+        filtered_image = cv2.cvtColor(filtered_image, cv2.COLOR_BGR2GRAY)
+        normalized_image = normalize_image(filtered_image)
+        # normalized_image = cv2.cvtColor(normalized_image, cv2.COLOR_GRAY2RGB)
+        # image_resize = cv2.resize(brightness_corrected, (original_width, original_height), interpolation=cv2.INTER_LANCZOS4)
+        cv2.imwrite("filtered" + '.png', normalized_image)
+        print(cnn_model(image)["message"])
+        # print("Hello")
+        # os.remove("extracted.png")
+        # os.remove("filtered.png")
+    else:
+        print("Eyes not detected")
+
+except Exception as e:
+    print("Face Not Detected")
+path = "./resources/anti_spoof_models"
+sp.test("extracted.png", path , 0)
