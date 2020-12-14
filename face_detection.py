@@ -46,10 +46,8 @@ def image_capture():
     cv2.destroyAllWindows()
     return image
 
-
 image = image_capture()
-path = "./resources/anti_spoof_models"
 
+path = "./resources/anti_spoof_models"
 sp.test(image, path , 0)
-# os.remove("extracted.png")
 

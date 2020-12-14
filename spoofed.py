@@ -38,12 +38,12 @@ def test(image_name, model_dir, device_id):
     label = np.argmax(prediction)
     value = prediction[0][label]/2
     if label == 1:
-        print("Image has Real Face. Confidence: {:.2f}.".format(value))
-        result_text = "RealFace Confidence: {:.2f}".format(value)
+        print("Real Face")
+        result_text = "RealFace"
         color = (255, 0, 0)
     else:
-        print("Image has Fake Face. Score: {:.2f}.".format(value))
-        result_text = "FakeFace Score: {:.2f}".format(value)
+        print("Fake Face")
+        result_text = "FakeFace"
         color = (0, 0, 255)
     print("Prediction speed {:.2f} s".format(test_speed))
     
