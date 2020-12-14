@@ -60,7 +60,7 @@ def test(image_name, model_dir, device_id):
     # draw result of prediction
     label = np.argmax(prediction)
     value = prediction[0][label]/2
-    if label == 1:
+    if label == 1 and value > 0.7:
         print("Image '{}' is Real Face. Score: {:.2f}.".format(image_name, value))
         result_text = "RealFace Score: {:.2f}".format(value)
         color = (255, 0, 0)
@@ -68,7 +68,7 @@ def test(image_name, model_dir, device_id):
         print("Image '{}' is Fake Face. Score: {:.2f}.".format(image_name, value))
         result_text = "FakeFace Score: {:.2f}".format(value)
         color = (0, 0, 255)
-    print("Prediction cost {:.2f} s".format(test_speed))
+    print("Prediction speed {:.2f} s".format(test_speed))
     # cv2.rectangle(
     #     image,
     #     (image_bbox[0], image_bbox[1]),
