@@ -17,7 +17,7 @@ from src.generate_patches import CropImage
 from src.utility import parse_model_name
 warnings.filterwarnings('ignore')
 
-SAMPLE_IMAGE_PATH = "./images/sample/"
+# SAMPLE_IMAGE_PATH = "./images/sample/"
 
 # def check_image(image):
 #     height, width, channel = image.shape
