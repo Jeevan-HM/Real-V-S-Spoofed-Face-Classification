@@ -3,9 +3,9 @@
 * ### _Real Face_ :
   Real Faces are those where an actual person is detected and is not a part of an inanimated object such as a smartphone.
 * ### _Fake/Spoofed Face_ :
-  Fake Face/Spoffed are Photos of a person shown from inanimated objects like Phone, ID Card etc. shown to the Camera.
+  Fake/Spoffed Face are the photos of a person shown from inanimated objects like a Phone, ID Card etc. shown to the Camera.
 
-#### _NOTE_ : This project is based on Python3.8
+#### _NOTE_ : This project is built on Python3.8
 ## Installing the requirements
 ```bash
 pip -m install -r requirements.txt
@@ -19,4 +19,7 @@ pip3 install -r requirements.txt
 python3 face_detection.py
 ```
 ### Input for Program
-- After runing the above command, webcam will turn on to take a picture of your face. To capture the picture press "q", program will capture the frame as input and predict if detected face category (Real/Spoofed)!
+- After runing the above command, the webcam will turn on. To capture the picture press "q", program will capture the frame as the input and predict if the detected face is  Real/Spoofed.
+
+## Reference 
+- [Silent-Face-Anti-Spoofing](https://github.com/minivision-ai/Silent-Face-Anti-Spoofing)
