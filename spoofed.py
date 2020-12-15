@@ -1,5 +1,4 @@
 import os
-import cv2
 import numpy as np
 import argparse
 import warnings
@@ -11,7 +10,8 @@ from src.utility import parse_model_name
 warnings.filterwarnings('ignore')
 
 def test(image_name, model_dir, device_id):
-    
+    ## If input is an image from a folder ##
+    # image = cv2.imread(image_name)
     model_test = AntiSpoofPredict(device_id)
     image_cropper = CropImage()
     image_bbox = model_test.get_bbox(image_name)
@@ -38,12 +38,12 @@ def test(image_name, model_dir, device_id):
     label = np.argmax(prediction)
     value = prediction[0][label]/2
     if label == 1:
-        print("Real Face")
-        result_text = "RealFace"
+        print("Real Face. Score: {:.2f}.".format(value))
+        result_text = "RealFace Score: {:.2f}".format(value)
         color = (255, 0, 0)
     else:
-        print("Fake Face")
-        result_text = "FakeFace"
+        print("Fake Face. Score: {:.2f}.".format(value))
+        result_text = "FakeFace Score: {:.2f}".format(value)
         color = (0, 0, 255)
     print("Prediction speed {:.2f} s".format(test_speed))
     
